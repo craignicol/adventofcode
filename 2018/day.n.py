@@ -5,5 +5,16 @@ def execute():
         lines = inp.readlines()
     return len(lines)
 
+def verify(a, b):
+    if (a == b):
+        print("✓")
+        return
+    
+    print (locals())
+
+def test_cases():
+    pass
+
 if __name__ == "__main__":
+    test_cases()
     print(execute())
