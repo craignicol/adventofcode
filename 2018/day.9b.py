@@ -1,24 +1,25 @@
 #!/usr/bin/env python3
 
+from collections import deque
+
 def execute():
     # 400 players; last marble is worth 71864 points
     return marble_high_score(400, 71864), marble_high_score(400, 7186400)
 
 def marble_high_score(players, last_marble, verbose = False):
-    marble_circle = [0]
+    marble_circle = deque([0])
     current_index = 0
     scores = [0] * players
     for marble in range(1,last_marble+1):
         if marble % 23 == 0:
             winner = marble % players
             scores[winner] += marble
-            bonus_index = (current_index-7) % len(marble_circle)
-            scores[winner] += marble_circle[bonus_index]
-            del marble_circle[bonus_index]
-            current_index = bonus_index % len(marble_circle) # % in case last
+            marble_circle.rotate(7)
+            scores[winner] += marble_circle.pop()
+            marble_circle.rotate(-1)
         else:
-            current_index = (current_index+2) % len(marble_circle)
-            marble_circle.insert(current_index, marble)
+            marble_circle.rotate(-1)
+            marble_circle.append(marble)
         if verbose:
             print (marble_circle, marble_circle[current_index], scores)
         if marble % 10000 == 0:
@@ -39,7 +40,7 @@ scores = """10 players; last marble is worth 1618 points: high score is 8317
 30 players; last marble is worth 5807 points: high score is 37305"""
 
 def test_cases():
-    verify(marble_high_score(9,25), 32)
+    verify(marble_high_score(9,25,True), 32)
     verify(marble_high_score(10,1618), 8317)
     verify(marble_high_score(13,7999), 146373)
     verify(marble_high_score(17,1104), 2764)
