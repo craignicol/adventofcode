@@ -105,3 +105,4 @@ venv.bak/
 
 # advent of code
 input.*
+output.*

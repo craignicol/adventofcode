@@ -5,7 +5,7 @@ from collections import Counter
 def execute():
     with open('input.10.txt') as inp:
         lines = inp.readlines()
-    for frame in animate_keyframes([l.strip() for l in lines if len(l.strip()) > 0]):
+    for frame in animate_keyframes([l.strip() for l in lines if len(l.strip()) > 0], 100000):
         print(frame)
 
 # frame is always square
@@ -21,16 +21,26 @@ def extend_frame(frame, extent):
     return new_frame
 
 def render_frame(pos_vel, abs_max_value = 2, frame_num = 1):
-    frame = extend_frame(None, abs_max_value)
-    for (pos, vel) in pos_vel:
-        (right, down) = pos
-        extent = max(abs(right), abs(down))
-        if extent * 2 > len(frame):
-            frame = extend_frame(frame, extent)
-        origin = (len(frame) // 2)
-        frame[origin+down] = frame[origin+down][:origin+right] + '#' + frame[origin+down][origin+right+1:]
+    current_y = None
+    frame = ''
     with open("output.10.f" + str(frame_num) + ".txt", "w") as f:
-        f.write('\n'.join(frame))
+        for (pos, vel) in sorted(pos_vel, key=lambda x:x[0][1]):
+            (right, down) = pos
+            if (current_y is None):
+                current_y = down
+            elif (down > current_y):
+                f.write(frame + '\n')
+                frame = '.' * len(frame) 
+                for x in range(down-current_y-1):
+                    f.write(frame + '\n')
+                current_y = down
+            extent = abs(right)
+            if extent * 2 > len(frame):
+                offset = extent - (len(frame) // 2)
+                frame = ('.' * offset) + frame + ('.' * offset)
+            origin = (len(frame) // 2)
+            frame = frame[:origin+right] + '#' + frame[origin+right+1:]
+        f.write(frame + '\n')
     return "."
 
 def animate(pos_vel):
@@ -39,15 +49,15 @@ def animate(pos_vel):
         result.append(((pos[0]+vel[0], pos[1]+vel[1]), vel))
     return result
     
-# Keyframe if column contains 7 stars 
+# Keyframe if column contains 5 stars close together
 def is_key_frame(pos_vel):
     result = True
     count = Counter([p[0] for (p,v) in pos_vel])
-    if max(count.values()) > 6:
+    if max(count.values()) > 6 and len([c for c in count.values() if c > 6]) >= len(pos_vel) // 20:
         return True
     return False
 
-def animate_keyframes(position_velocity):
+def animate_keyframes(position_velocity, max_frames = 5):
     pos_vel = []
     abs_max_value = 0
     for pv in position_velocity:
@@ -60,9 +70,9 @@ def animate_keyframes(position_velocity):
         if extent > abs_max_value:
             abs_max_value = extent
     frames = []
-    for i in range(5):
+    for i in range(max_frames):
         if is_key_frame(pos_vel):
-            frames.append(render_frame(pos_vel, abs_max_value, i))
+            frames.append(render_frame(pos_vel, 10, i))
         pos_vel = animate(pos_vel)
     return frames
 
