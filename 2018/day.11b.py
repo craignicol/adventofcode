@@ -31,15 +31,15 @@ def highest_power_cordinate(serial_number):
         if w > 2:
             for f in range(2,w):
                 if (w / f) in energy_grid:
-                    factor = f
+                    # factor = f
                     break
 
         for x in range(grid_size - w):
             for y in range(grid_size - w):
                 if factor is not None:
                     energy = sum([sum(energy_grid[w / factor][x+c][y:y+factor+1]) for c in range(factor)])
-                elif w > 2:
-                    energy = energy_grid[w-1][x][y] + sum(grid[x+w-1][y:y+w]) + sum([grid[x+c][y+w] for c in range(w)])
+                elif w > 3:
+                    energy = energy_grid[w-1][x][y] + energy_grid[w-1][x+1][y+1] + grid[x][y+w-1] + grid[x+w-1][y] - energy_grid[w-2][x+1][y+1]
                 else:
                     energy = sum([sum(grid[x+c][y:y+w]) for c in range(w)])
                 if max_power is None or energy > max_power:
@@ -52,7 +52,7 @@ def highest_power_cordinate(serial_number):
         t = time.time()
         print(':', w, '-', t - last_t, 'factor =', factor, (max_x, max_y, max_window_size, max_power))
         last_t = t
-    return (max_x, max_y, max_window_size, max_power)
+    return (max_x, max_y, max_window_size)
 
 def verify(a, b):
     if (a == b):
