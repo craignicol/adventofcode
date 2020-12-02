@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 def execute():
-    with open('input.1.txt') as inp:
+    with open('2020/input/1.txt') as inp:
         lines = inp.readlines()
     return len([l.strip() for l in lines if len(l.strip()) > 0])
 
