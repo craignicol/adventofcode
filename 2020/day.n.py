@@ -12,7 +12,7 @@ def verify(a, b):
     global tests_executed
     global tests_failed
 
-    tests_executed = 1
+    tests_executed += 1
     if (a == b):
         print("✓")
         return
