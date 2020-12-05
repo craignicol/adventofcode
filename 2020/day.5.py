@@ -3,7 +3,8 @@
 def execute():
     with open('2020/input/5.txt') as inp:
         lines = inp.readlines()
-    return get_max_id([l.strip() for l in lines if len(l.strip()) > 0])
+    seats = [l.strip() for l in lines if len(l.strip()) > 0]
+    return get_max_id(seats), get_missing_id(seats)
 
 tests_failed = 0
 tests_executed = 0
@@ -32,6 +33,14 @@ def get_id(seatref):
 
 def get_max_id(seats):
     return max([get_id(seat) for seat in seats])
+
+def get_missing_id(seats):
+    sorted_seats = sorted([get_id(seat) for seat in seats])
+    first_seat = sorted_seats[0]
+    for i in range (1,len(sorted_seats)-1):
+        if sorted_seats[i] != first_seat + i:
+            return sorted_seats[i] - 1
+    return -1
 
 def test_cases():
     verify(get_seat("FBFBBFFRLR"), (44,5))
