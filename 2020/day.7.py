@@ -10,10 +10,18 @@ vibrant plum bags contain 5 faded blue bags, 6 dotted black bags.
 faded blue bags contain no other bags.
 dotted black bags contain no other bags."""
 
+example_rules2 = """shiny gold bags contain 2 dark red bags.
+dark red bags contain 2 dark orange bags.
+dark orange bags contain 2 dark yellow bags.
+dark yellow bags contain 2 dark green bags.
+dark green bags contain 2 dark blue bags.
+dark blue bags contain 2 dark violet bags.
+dark violet bags contain no other bags."""
+
 def execute():
     with open('2020/input/7.txt') as inp:
         lines = inp.readlines()
-    return count_parents(''.join(lines), "shiny gold")
+    return count_parents(''.join(lines), "shiny gold"), count_children(''.join(lines), "shiny gold")
 
 tests_failed = 0
 tests_executed = 0
@@ -45,7 +53,7 @@ def parse_ruleset(ruleset):
     for rule in ruleset.splitlines():
         parent, children = parse_rule(rule)
         rules[parent] = children
-    return invert_tree(rules)
+    return rules
 
 def invert_tree(rule_tree):
     result = {}
@@ -69,11 +77,22 @@ def find_parents(parent_rules, bag_id):
     return found
 
 def count_parents(ruleset, bag_id):
-    rule_tree = parse_ruleset(ruleset)
+    rule_tree = invert_tree(parse_ruleset(ruleset))
     return len(find_parents(rule_tree, bag_id))
+
+def count_my_children(rule_tree, my_bag):
+    (bag_id, count) = my_bag
+    return count + count * sum([count_my_children(rule_tree, c) for c in rule_tree[bag_id]])
+
+def count_children(ruleset, bag_id):
+    rule_tree = parse_ruleset(ruleset)
+    return sum([count_my_children(rule_tree, c) for c in rule_tree[bag_id]])
 
 def test_cases():
     verify(count_parents(example_rules, "shiny gold"), 4)
+    verify(count_children(example_rules, "faded blue"), 0)
+    verify(count_children(example_rules, "shiny gold"), 32)
+    verify(count_children(example_rules2, "shiny gold"), 126)
     print("Failed {} out of {} tests. ".format(tests_failed, tests_executed))
 
 if __name__ == "__main__":
