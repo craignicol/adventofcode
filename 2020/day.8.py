@@ -13,7 +13,7 @@ acc +6"""
 def execute():
     with open('2020/input/8.txt') as inp:
         lines = inp.readlines()
-    return run_until_loop([l.strip() for l in lines if len(l.strip()) > 0])["accumulator"]
+    return run_until_loop_or_exit([l.strip() for l in lines if len(l.strip()) > 0])["accumulator"]
 
 tests_failed = 0
 tests_executed = 0
@@ -30,11 +30,11 @@ def verify(a, b):
     tests_failed += 1
     print (locals())
 
-def run_until_loop(code):
+def run_until_loop_or_exit(code):
     accumulator = 0
     pos = 0
     seen_positions = set()
-    while(pos not in seen_positions):
+    while(pos not in seen_positions and pos < len(code)):
         seen_positions.add(pos)
         (command, value) = code[pos].split()
         if command == "nop":
@@ -47,7 +47,7 @@ def run_until_loop(code):
     return locals()
 
 def test_cases():
-    verify(run_until_loop(example.splitlines())["accumulator"], 5)
+    verify(run_until_loop_or_exit(example.splitlines())["accumulator"], 5)
     print("Failed {} out of {} tests. ".format(tests_failed, tests_executed))
 
 if __name__ == "__main__":
