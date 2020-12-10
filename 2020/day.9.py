@@ -25,7 +25,8 @@ def execute():
     with open('2020/input/9.txt') as inp:
         lines = inp.readlines()
     xmas = [l.strip() for l in lines if len(l.strip()) > 0]
-    return first_invalid([int(e) for e in xmas], 25)
+    xmas = [int(e) for e in xmas]
+    return first_invalid(xmas, 25), find_weakness(xmas, 25)
 
 tests_failed = 0
 tests_executed = 0
@@ -52,7 +53,7 @@ def is_valid(preamble, next):
 def first_invalid(xmas, length):
     for i in range(len(xmas)-length):
         if not is_valid(xmas[i:i+length], xmas[i+length]):
-            return xmas[i:i+length], xmas[i+length]
+            return xmas[i+length]
     return None
 
 def find_weakness(xmas, length):
@@ -65,8 +66,8 @@ def find_weakness(xmas, length):
             total += xmas[j]
             if total > target:
                 break
-            if total = target:
-                return xmas[i], xmas[j]
+            if total == target:
+                return min(xmas[i:j+1]) + max(xmas[i:j+1])
     return None
 
 def test_cases():
