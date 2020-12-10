@@ -12,7 +12,8 @@ NOT y -> i"""
 def execute():
     with open('2015/input/7.txt') as inp:
         lines = inp.readlines()
-    return emulate([l.strip() for l in lines if len(l.strip()) > 0])
+    booklet = [l.strip() for l in lines if len(l.strip()) > 0]
+    return emulate(booklet), "!!!!!!!!!!!!!!!!!!!!", emulate(booklet, 46065)
 
 tests_failed = 0
 tests_executed = 0
@@ -55,7 +56,7 @@ def evaluate(expression,wires):
         
     return None
 
-def emulate(program):
+def emulate(program, b_value = 0):
     wires = {c:0 for c in "abcdefghijklmnopqrstuvwxyz"}
     for i in range(len(program)):
         for op in program:
