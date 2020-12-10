@@ -55,6 +55,20 @@ def first_invalid(xmas, length):
             return xmas[i:i+length], xmas[i+length]
     return None
 
+def find_weakness(xmas, length):
+    target = first_invalid(xmas, length)
+    for i in range(len(xmas)):
+        total = xmas[i]
+        if total >= target:
+            continue
+        for j in range(i+1, len(xmas)):
+            total += xmas[j]
+            if total > target:
+                break
+            if total = target:
+                return xmas[i], xmas[j]
+    return None
+
 def test_cases():
     preamble = range(1,26)
     verify(is_valid(preamble, 26), True)
@@ -66,7 +80,9 @@ def test_cases():
     verify(is_valid(preamble, 65), False)
     verify(is_valid(preamble, 64), True)
     verify(is_valid(preamble, 66), True)
-    verify(first_invalid([int(e) for e in example.splitlines()], 5), 127)
+    xmas = [int(e) for e in example.splitlines()]
+    verify(first_invalid(xmas, 5), 127)
+    verify(find_weakness(xmas, 5), 62)
     print("Failed {} out of {} tests. ".format(tests_failed, tests_executed))
 
 if __name__ == "__main__":
