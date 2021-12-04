@@ -3,7 +3,8 @@
 def execute():
     with open('./input/day.1.txt') as inp:
         lines = inp.readlines()
-    return len([l.strip() for l in lines if len(l.strip()) > 0])
+    data = [l.strip() for l in lines if len(l.strip()) > 0]
+    return len(data)
 
 tests_failed = 0
 tests_executed = 0
