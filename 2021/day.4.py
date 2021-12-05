@@ -4,7 +4,7 @@ def execute():
     with open('./input/day.4.txt') as inp:
         lines = inp.readlines()
     data = [l.strip() for l in lines if len(l.strip()) > 0]
-    return calculate_bingo_score(data)
+    return calculate_bingo_score(data, 0), calculate_bingo_score(data, -1)
 
 tests_failed = 0
 tests_executed = 0
@@ -60,25 +60,32 @@ def winning_column(board, pos):
     return board[pos%5:25:5] == [None] * 5
 
 def mark_boards(n, boards):
-    for b in boards:
+    winners = []
+    for i, b in enumerate(boards):
         if n in b:
             pos = b.index(n)
             b[pos] = None
             if winning_row(b, pos) or winning_column(b, pos):
-                return calculate_score(b)
+                winners.append((i, calculate_score(b)))
+    if len(winners) > 0:
+        return winners
     return None
 
 def play_bingo(numbers, boards):
-    score = 0
-    last_drawn = None
+    scores_by_board = [None] * len(boards)
+    scores_by_winner = []
     for n in numbers:
-        score = mark_boards(n, boards)
-        if score is not None:
-            last_drawn = int(n)
-            break
-    return (score, last_drawn)
+        winners = mark_boards(n, boards)
+        if winners is not None:
+            for i, s in winners:
+                if scores_by_board[i] is None:
+                    scores_by_board[i] = s * int(n)
+                    scores_by_winner.append(s * int(n))
+            if len(scores_by_winner) == len(boards):
+                break
+    return scores_by_winner
 
-def calculate_bingo_score(numbers_and_boards):
+def calculate_bingo_score(numbers_and_boards, place):
     numbers = numbers_and_boards[0].split(',')
     boards = []
     next_board = []
@@ -88,11 +95,12 @@ def calculate_bingo_score(numbers_and_boards):
             if len(next_board) == 25:
                 boards.append(next_board)
                 next_board = []
-    (score, last_drawn) = play_bingo(numbers, boards)
-    return score * last_drawn
+    scores = play_bingo(numbers, boards)
+    return scores[place]
 
 def test_cases():
-    verify(calculate_bingo_score(example1), 4512)
+    verify(calculate_bingo_score(example1, 0), 4512)
+    verify(calculate_bingo_score(example1, -1), 1924)
     print("Failed {} out of {} tests. ".format(tests_failed, tests_executed))
 
 if __name__ == "__main__":
