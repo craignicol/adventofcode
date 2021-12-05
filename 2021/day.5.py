@@ -37,12 +37,16 @@ example1 = """0,9 -> 5,9
 def get_range(start, end):
     x_dir = 1 if end[0] >= start[0] else -1
     y_dir = 1 if end[1] >= start[1] else -1
+
+    # This does not work in the general case, but in this solution we're guaranteed a 45 degree angle
+    #  or a horizontal or vertical line
+    # If we're not a diagonal, we need to stretch the fixed dimension to the length of the other dimension
+    #  so that we can iterate over the range
     x_range = range(start[0], end[0] + x_dir, x_dir) if start[0] != end[0] else [start[0]] * (abs(end[1] - start[1]) + 1)
     y_range = range(start[1], end[1] + y_dir, y_dir) if start[1] != end[1] else [start[1]] * (abs(end[0] - start[0]) + 1)
     return [(x,y) for (x,y) in zip(x_range, y_range)]
 
 def count_overlaps(data, ignore_diag):
-    """Note that this currently discards diagonals"""
     vents_sparse = defaultdict(int)
     for line in data:
         line = line.split(' -> ')
