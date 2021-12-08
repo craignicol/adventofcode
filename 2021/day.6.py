@@ -29,7 +29,7 @@ def count_lanternfish(initial_state, days):
     state = [int(x) for x in initial_state.split(',')]
     count = len(state)
     for i in range(days):
-        count += state.count(i % 6) + state.count(i % 8)
+        count += state.count(i % 6) + state.count((i-2) % 6)
     return count
 
 def test_cases():
