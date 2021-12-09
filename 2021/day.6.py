@@ -4,7 +4,7 @@ def execute():
     with open('./input/day.6.txt') as inp:
         lines = inp.readlines()
     data = [l.strip() for l in lines if len(l.strip()) > 0]
-    return len(data), count_lanternfish(data[0], 80)
+    return len(data), count_lanternfish(data[0], 80), count_lanternfish(data[0], 256)
 
 tests_failed = 0
 tests_executed = 0
@@ -26,11 +26,12 @@ example1 = """3,4,3,1,2"""
 # 5 5 6 7 9 10 10 10 10 11 12 15 17 19 20 20 21 22 26
 
 def count_lanternfish(initial_state, days):
-    state = [int(x) for x in initial_state.split(',')]
-    count = len(state)
+    ages = [int(x) for x in initial_state.split(',')]
+    state = [ages.count(i) for i in range(9)]
     for i in range(days):
-        count += state.count(i % 6) + state.count((i-2) % 6)
-    return count
+        a, b, c, d, e, f, g, h, i = state
+        state = [b, c, d, e, f, g, h+a, i, a]
+    return sum(state)
 
 def test_cases():
     verify(count_lanternfish(example1, 0), 5)
@@ -47,7 +48,7 @@ def test_cases():
     verify(count_lanternfish(example1, 11), 15)
     verify(count_lanternfish(example1, 12), 17)
     verify(count_lanternfish(example1, 13), 19)
-    verify(count_lanternfish(example1, 14), 10)
+    verify(count_lanternfish(example1, 14), 20)
     verify(count_lanternfish(example1, 15), 20)
     verify(count_lanternfish(example1, 16), 21)
     verify(count_lanternfish(example1, 17), 22)
