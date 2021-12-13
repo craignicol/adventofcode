@@ -4,7 +4,7 @@ def execute():
     with open('./input/day.11.txt') as inp:
         lines = inp.readlines()
     data = [l.strip() for l in lines if len(l.strip()) > 0]
-    return count_flashes(data, 100)
+    return count_flashes(data, 100), first_total_flash(data)
 
 tests_failed = 0
 tests_executed = 0
@@ -82,6 +82,15 @@ def count_flashes(data, steps):
         flashes += next_flashes
     return flashes
 
+def first_total_flash(data):
+    step = 0
+    data = parse_data(data)
+    flashes = 0
+    while flashes < 100:
+        step += 1
+        data, flashes = next_step(data)
+    return step
+
 def parse_data(data):
     return [[int(i) for i in l] for l in data]
 
@@ -89,6 +98,7 @@ def test_cases():
     verify(next_step(parse_data(example1))[0], parse_data(example1_step1))
     verify(next_step(parse_data(example1_step1))[0], parse_data(example1_step2))
     verify(count_flashes(example1, 100), 1656)
+    verify(first_total_flash(example1), 195)
     print("Failed {} out of {} tests. ".format(tests_failed, tests_executed))
 
 if __name__ == "__main__":
