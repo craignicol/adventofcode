@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
 
+from typing import DefaultDict
+
+
 def execute():
     with open('./input/day.12.txt') as inp:
         lines = inp.readlines()
@@ -60,10 +63,15 @@ pj-fs
 start-RW""".splitlines()
 
 def parse_map(map):
-    return {}
+    result = DefaultDict(set)
+    for route in map:
+        source, dest = route.split('-')
+        result[source].add(dest)
+        result[dest].add(source)
+    return result
 
 def unique_paths(map):
-    return []
+    return map.keys()
 
 def count_paths(map):
     return len(unique_paths(parse_map(map)))
