@@ -7,7 +7,7 @@ def execute():
     with open('./input/day.12.txt') as inp:
         lines = inp.readlines()
     data = [l.strip() for l in lines if len(l.strip()) > 0]
-    return len(data)
+    return count_paths(data)
 
 tests_failed = 0
 tests_executed = 0
@@ -71,10 +71,30 @@ def parse_map(map):
     return result
 
 def unique_paths(map):
-    return map.keys()
+    visited = set()
+    unvisited = set()
+    all = set(map.keys())
+    unvisited.add('start')
+    paths = [['start']]
+    l = 0
+    while len([p for p in paths if p[-1] != 'end']) > 0: # We're still growing
+        l = len(paths)
+        current = unvisited.pop()
+        visited.add(current)
+        if current == 'end':
+            continue
+        for dest in map[current]:
+            unvisited.add(dest)
+            for p in paths[:]:
+                if p[-1] == current:
+                    if dest.isupper() or dest not in p: 
+                        paths.append(p + [dest])
+        paths = [p for p in paths if p[-1] != current] # remove dead ends
+    return [p for p in paths if p[-1] == 'end']
 
 def count_paths(map):
-    return len(unique_paths(parse_map(map)))
+    p = unique_paths(parse_map(map))
+    return len(p) # if len(p) > 20 else p
 
 def test_cases():
     verify(count_paths(example1), 10)
