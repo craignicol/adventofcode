@@ -7,7 +7,7 @@ def execute():
     with open('./input/day.12.txt') as inp:
         lines = inp.readlines()
     data = [l.strip() for l in lines if len(l.strip()) > 0]
-    return count_paths(data)
+    return count_paths(data), count_paths_with_reuse(data)
 
 tests_failed = 0
 tests_executed = 0
@@ -92,14 +92,46 @@ def unique_paths(map):
         paths = [p for p in paths if p[-1] != current] # remove dead ends
     return [p for p in paths if p[-1] == 'end']
 
+def clone_key(map, key):
+    result = DefaultDict(set)
+    result[key] = map[key].copy()
+    result["0"] = map[key].copy()
+    for k in map.keys():
+        if k != key:
+            result[k] = map[k].copy()
+            if key in map[k]:
+                result[k].add("0")
+    return result
+
+def unclone_paths(paths, key):
+    result = []
+    for p in paths:
+        result.append(",".join(p).replace("0", key))
+    return result
+
+def unique_paths_with_reuse(map):
+    paths = set()
+    for source in map.keys():
+        if source.islower() and source not in ['0', 'start', 'end']:
+            reuse_paths = unique_paths(clone_key(map, source))
+            paths.update(set(unclone_paths(reuse_paths, source)))
+    return paths
+
 def count_paths(map):
     p = unique_paths(parse_map(map))
+    return len(p) # if len(p) > 20 else p
+
+def count_paths_with_reuse(map):
+    p = unique_paths_with_reuse(parse_map(map))
     return len(p) # if len(p) > 20 else p
 
 def test_cases():
     verify(count_paths(example1), 10)
     verify(count_paths(example2), 19)
     verify(count_paths(example3), 226)
+    verify(count_paths_with_reuse(example1), 36)
+    verify(count_paths_with_reuse(example2), 103)
+    verify(count_paths_with_reuse(example3), 3509)
     print("Failed {} out of {} tests. ".format(tests_failed, tests_executed))
 
 if __name__ == "__main__":
