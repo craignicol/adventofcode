@@ -5,7 +5,8 @@ def execute():
         lines = inp.readlines()
     data = [l.strip() for l in lines if len(l.strip()) > 0]
     paper = fold_paper(parse_origami(data))
-    return render(paper), count_dots(paper)
+    render(paper)
+    return count_dots(paper)
 
 tests_failed = 0
 tests_executed = 0
