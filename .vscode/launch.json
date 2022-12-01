@@ -9,7 +9,7 @@
       "type": "python",
       "request": "launch",
       "program": "${file}",
-      "cwd": "${workspaceFolder}/2021",
+      "cwd": "${workspaceFolder}/2022",
       "console": "integratedTerminal"
     }
   ]
