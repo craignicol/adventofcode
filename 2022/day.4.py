@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 def execute():
-    with open('./input/day.4.txt') as inp:
+    with open('2022/input/day.4.txt') as inp:
         lines = inp.readlines()
     data = [l.strip() for l in lines if len(l.strip()) > 0]
     return count_fully_enclosed(data), count_overlap(data)

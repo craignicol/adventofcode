@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 def execute():
-    with open('./input/day.1.txt') as inp:
+    with open('2022/input/day.1.txt') as inp:
         lines = inp.readlines()
     data = "".join(lines)
     return most_calories(data), top_three_total(data)
