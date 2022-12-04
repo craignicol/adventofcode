@@ -4,7 +4,7 @@ def execute():
     with open('./input/day.3.txt') as inp:
         lines = inp.readlines()
     data = [l.strip() for l in lines if len(l.strip()) > 0]
-    return total_priority(data)
+    return total_priority(data), total_badge_priority(data)
 
 tests_failed = 0
 tests_executed = 0
@@ -39,6 +39,12 @@ def priority(c):
 def total_priority(data):
     return sum([priority(common_item(s)) for s in data])
 
+def find_badge(data):
+    return set(data[0]).intersection(set(data[1])).intersection(set(data[2])).pop()
+
+def total_badge_priority(data):
+    return sum([priority(find_badge(data[i:i+3])) for i in range(0, len(data), 3)])
+
 def test_cases():
     verify(common_item(sample_input[0]), "p")
     verify(common_item(sample_input[1]), "L")
@@ -53,6 +59,9 @@ def test_cases():
     verify(priority("t"), 20)
     verify(priority("s"), 19)
     verify(total_priority(sample_input), 157)
+    verify(find_badge(sample_input[0:3]), "r")
+    verify(find_badge(sample_input[3:6]), "Z")
+    verify(total_badge_priority(sample_input), 70)
     print("Failed {} out of {} tests. ".format(tests_failed, tests_executed))
 
 if __name__ == "__main__":
