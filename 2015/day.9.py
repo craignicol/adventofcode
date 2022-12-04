@@ -3,7 +3,8 @@
 def execute():
     with open('2015/input/9.txt') as inp:
         lines = inp.readlines()
-    return shortest_distance(create_graph([l.strip() for l in lines if len(l.strip()) > 0]))
+    data = create_graph([l.strip() for l in lines if len(l.strip()) > 0])
+    return shortest_distance(data), longest_distance(data)
 
 tests_failed = 0
 tests_executed = 0
@@ -50,9 +51,16 @@ def shortest_route(graph, start):
 def shortest_distance(graph):
     return min(shortest_route(graph, start) for start in graph)
 
+def longest_route(graph, start):
+    return max(shortest_route_from(graph, start, 0, set([start])))
+
+def longest_distance(graph):
+    return max(longest_route(graph, start) for start in graph)
+
 def test_cases():
     verify(create_graph(distances), {'London': {'Dublin': 464, 'Belfast': 518}, 'Dublin': {'London': 464, 'Belfast': 141}, 'Belfast': {'London': 518, 'Dublin': 141}})
     verify(shortest_distance(create_graph(distances)), 605)
+    verify(longest_distance(create_graph(distances)), 982)
     print("Failed {} out of {} tests. ".format(tests_failed, tests_executed))
 
 if __name__ == "__main__":
