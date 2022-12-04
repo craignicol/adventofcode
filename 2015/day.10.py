@@ -3,7 +3,7 @@
 def execute():
     with open('2015/input/10.txt') as inp:
         lines = inp.readlines()
-    return len(look_and_say_n_times([l.strip() for l in lines if len(l.strip()) > 0][0], 40))
+    return len(look_and_say_n_times([l.strip() for l in lines if len(l.strip()) > 0][0], 50))
 
 tests_failed = 0
 tests_executed = 0
