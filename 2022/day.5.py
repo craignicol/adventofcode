@@ -4,7 +4,7 @@ def execute():
     with open('2022/input/day.5.txt') as inp:
         lines = inp.readlines()
     data = [l for l in lines if len(l.strip()) > 0]
-    return move_crates(data)[1]
+    return move_crates(data)[1], move_crates9001(data)[1]
 
 tests_failed = 0
 tests_executed = 0
@@ -62,9 +62,20 @@ def move_crates(input):
             crates[int(end)-1].append(crates[int(start)-1].pop())
     return crates, ''.join([c[-1] for c in crates if len(c) > 0])
 
+def move_crates9001(input):
+    crates, moves = parse_input(input)
+    for move in moves:
+        _, count, _, start, _, end = move.split()
+        crates[int(end)-1].extend(crates[int(start)-1][-int(count):])
+        for i in range(int(count)):
+            crates[int(start)-1].pop()
+    return crates, ''.join([c[-1] for c in crates if len(c) > 0])
+
+
 def test_cases():
     verify(parse_input(sample_input)[0], [['Z', 'N'], ['M', 'C', 'D'], ['P']])
     verify(move_crates(sample_input)[1], "CMZ")
+    verify(move_crates9001(sample_input)[1], "MCD")
     print("Failed {} out of {} tests. ".format(tests_failed, tests_executed))
 
 if __name__ == "__main__":
