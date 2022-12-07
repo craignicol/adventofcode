@@ -4,7 +4,8 @@ def execute():
     with open('2022/input/day.7.txt') as inp:
         lines = inp.readlines()
     data = [l.strip() for l in lines if len(l.strip()) > 0]
-    return sum_of_less_than(create_tree(data), 100000)
+    d = create_tree(data)
+    return sum_of_less_than(d, 100000), free_up(d, 30000000)
 
 tests_failed = 0
 tests_executed = 0
@@ -80,6 +81,12 @@ def create_tree(lines):
 def sum_of_less_than(d, size):
     return sum([v for k, v in d.items() if v < size])
 
+def free_up(d, size):
+    max_size = 70000000
+    unused = max_size - d['/']
+    to_clear = size - unused
+    return min([v for k, v in d.items() if v > to_clear])
+
 def test_cases():
     d = create_tree(sample_input)
     verify(d['/'], 48381165)
@@ -87,6 +94,7 @@ def test_cases():
     verify(d['/a/e'], 584)
     verify(d['/d'], 24933642)
     verify(sum_of_less_than(d, 100000), 95437)
+    verify(free_up(d, 30000000), 24933642)
     print("Failed {} out of {} tests. ".format(tests_failed, tests_executed))
 
 if __name__ == "__main__":
