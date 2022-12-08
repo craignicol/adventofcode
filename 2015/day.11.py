@@ -3,7 +3,9 @@
 def execute():
     with open('2015/input/11.txt') as inp:
         lines = inp.readlines()
-    return next_password([l.strip() for l in lines if len(l.strip()) > 0][0])
+    data = [l.strip() for l in lines if len(l.strip()) > 0]
+    nxt = next_password(data[0])
+    return nxt, next_password(nxt)
 
 tests_failed = 0
 tests_executed = 0
