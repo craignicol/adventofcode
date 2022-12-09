@@ -4,7 +4,7 @@ def execute():
     with open('2022/input/day.9.txt') as inp:
         lines = inp.readlines()
     data = [l.strip() for l in lines if len(l.strip()) > 0]
-    return tail_positions(data)
+    return tail_positions(data)[1]
 
 tests_failed = 0
 tests_executed = 0
@@ -68,11 +68,24 @@ def tail_positions(moves):
                 visited.add(tail)
 
             head = (x,y)
-    return len(visited)
+    return visited, len(visited)
+
+def plot_path(visited):
+    height = max([y for x,y in visited])
+    width = max([x for x,y in visited])
+    height, width = max([height, width]), max([height, width])
+    for y in range(height, -1, -1):
+        for x in range(0, width+2):
+            if (x,y) in visited:
+                print("#", end="")
+            else:
+                print(".", end="")
+        print()
 
 def test_cases():
-    verify(tail_positions([]),1)
-    verify(tail_positions(sample_input),13)
+    verify(tail_positions([])[1],1)
+    verify(tail_positions(sample_input)[1],13)
+    plot_path(tail_positions(sample_input)[0])
     print("Failed {} out of {} tests. ".format(tests_failed, tests_executed))
 
 if __name__ == "__main__":
