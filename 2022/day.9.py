@@ -4,7 +4,7 @@ def execute():
     with open('2022/input/day.9.txt') as inp:
         lines = inp.readlines()
     data = [l.strip() for l in lines if len(l.strip()) > 0]
-    return tail_positions(data)[1]
+    return tail_positions(data)[1], 6284, tail_positions(data, 9)[1]
 
 tests_failed = 0
 tests_executed = 0
@@ -31,19 +31,30 @@ D 1
 L 5
 R 2""".splitlines()
 
-visited = set()
+sample_input2 = """
+R 5
+U 8
+L 8
+D 3
+R 17
+D 10
+L 25
+U 20
+""".splitlines()
 
 def sign(x):
     if x == 0:
         return 0
     return x // abs(x)
 
-def tail_positions(moves):
+def tail_positions(moves, tails = 1, animate = False):
+    visited = set()
+    moves.append("R 0")
     x = 0
     y = 0
     head = (x,y)
-    tail = (x,y)
-    visited.add(tail)
+    tails = [(x,y) for i in range(tails)]
+    visited.add(tails[-1])
     for move in moves:
         if len(move.strip()) == 0:
             continue
@@ -61,21 +72,28 @@ def tail_positions(moves):
             elif direction == "D":
                 y -= 1
 
+            following = (x,y)
+            new_tails = []
+            for tail in tails:
             # move the tail based on where the head was
-            xdiff, ydiff = head[0] - tail[0], head[1] - tail[1]
-            if abs(xdiff) > 1 or abs(ydiff) > 1: 
-                tail = (tail[0] + sign(xdiff), tail[1] + sign(ydiff))
-                visited.add(tail)
+                xdiff, ydiff = following[0] - tail[0], following[1] - tail[1]
+                if abs(xdiff) > 1 or abs(ydiff) > 1: 
+                    tail = (tail[0] + sign(xdiff), tail[1] + sign(ydiff))
+                following = tail    
+                new_tails.append(tail)
+            tails = new_tails
+            visited.add(tails[-1])
 
             head = (x,y)
-    return visited, len(visited)
+        if animate:
+            print (move, head, tails)
+    return visited, len(visited), [head] + tails
 
 def plot_path(visited):
-    height = max([y for x,y in visited])
-    width = max([x for x,y in visited])
-    height, width = max([height, width]), max([height, width])
-    for y in range(height, -1, -1):
-        for x in range(0, width+2):
+    height = min([y for x,y in visited]), max([y for x,y in visited])
+    width = min([x for x,y in visited]), max([x for x,y in visited])
+    for y in range(height[1]+1, height[0]-1, -1):
+        for x in range(width[0]-1, width[1]+1):
             if (x,y) in visited:
                 print("#", end="")
             else:
@@ -86,6 +104,11 @@ def test_cases():
     verify(tail_positions([])[1],1)
     verify(tail_positions(sample_input)[1],13)
     plot_path(tail_positions(sample_input)[0])
+    verify(tail_positions(sample_input, 9)[1],1)
+    plot_path(tail_positions(sample_input, 9)[0])
+    verify(tail_positions(sample_input2, 9)[1],36)
+    plot_path(tail_positions(sample_input2, 9)[0])
+    # verify(tail_positions(sample_input2, 9, True)[2], [])
     print("Failed {} out of {} tests. ".format(tests_failed, tests_executed))
 
 if __name__ == "__main__":
