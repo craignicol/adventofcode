@@ -4,7 +4,9 @@ def execute():
     with open('2022/input/day.10.txt') as inp:
         lines = inp.readlines()
     data = [l.strip() for l in lines if len(l.strip()) > 0]
-    return signal_strength(run_program(data))
+    mem = run_program(data)
+    print(render_image(mem))
+    return signal_strength(mem)
 
 tests_failed = 0
 tests_executed = 0
@@ -173,6 +175,14 @@ noop
 noop
 """.splitlines()
 
+expected = """##..##..##..##..##..##..##..##..##..##..
+###...###...###...###...###...###...###.
+####....####....####....####....####....
+#####.....#####.....#####.....#####.....
+######......######......######......####
+#######.......#######.......#######.....
+"""
+
 def run_program(program):
     x = 1
     memory = [x]
@@ -196,6 +206,12 @@ def signal_strength(program):
         + 180 * program[180] \
         + 220 * program[220]
 
+def render_image(program):
+    if len(program) < 240:
+        return ""
+    raw = "".join(["#" if abs(ind%40-x) < 2 else "." for ind, x in enumerate(program[0:240])])
+    return "\n".join([raw[i:i+40] for i in range(0, len(raw), 40)])
+
 def test_cases():
     verify(run_program(short_input)[-1], -1)
     verify(run_program(long_input)[20], 21)
@@ -205,6 +221,7 @@ def test_cases():
     verify(run_program(long_input)[180], 16)
     verify(run_program(long_input)[220], 18)
     verify(signal_strength(run_program(long_input)), 13140)
+    verify(render_image(run_program(long_input)), expected)
     print("Failed {} out of {} tests. ".format(tests_failed, tests_executed))
 
 if __name__ == "__main__":
