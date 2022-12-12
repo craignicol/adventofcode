@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 
 def execute():
-    with open('2022/input/day.1.txt') as inp:
+    with open('2022/input/day.12.txt') as inp:
         lines = inp.readlines()
     data = [l.strip() for l in lines if len(l.strip()) > 0]
-    return len(data)
+    return shortest_path(data)
 
 tests_failed = 0
 tests_executed = 0
@@ -52,8 +52,8 @@ def shortest_path(data):
         visited.append([])
         for x,y in last:
             height = elevations[x][y] + 1 # Can go up at most 1
-            if last == target:
-                return s
+            if (x, y) == target:
+                return s - 1
             if x > 0 and elevations[x - 1][y] <= height and paths[x - 1][y] is None:
                 paths[x - 1][y] = s
                 visited[-1].append((x - 1, y))
@@ -63,10 +63,11 @@ def shortest_path(data):
             if y > 0 and elevations[x][y - 1] <= height and paths[x][y - 1] is None:
                 paths[x][y - 1] = s
                 visited[-1].append((x, y - 1))
-            if y < len(elevations) - 1 and elevations[x][y + 1] <= height and paths[x][y + 1] is None:
+            if y < len(elevations[x]) - 1 and elevations[x][y + 1] <= height and paths[x][y + 1] is None:
                 paths[x][y + 1] = s
                 visited[-1].append((x, y + 1))
-    return paths
+    print('\n'.join(['.'.join([str(c) if c != None else '_' for c in p]) for p in paths]))
+    return visited, target
 
 def test_cases():
     verify(shortest_path(sample_input), 31)
