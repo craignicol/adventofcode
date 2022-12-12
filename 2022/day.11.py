@@ -3,8 +3,8 @@
 def execute():
     with open('2022/input/day.11.txt') as inp:
         lines = inp.readlines()
-    data = parse_monkeys([l.strip() for l in lines])
-    return len(data)
+    data = [l.strip() for l in lines]
+    return monkey_business(data)
 
 tests_failed = 0
 tests_executed = 0
@@ -65,6 +65,7 @@ class Monkey:
         self.items = items
         self.operation = operation
         self.test = test
+        self.inspections = 0
 
     def __str__(self):
         return "Monkey {}: {} {} {}".format(self.id, self.items, "<lambda>", self.test)
@@ -96,6 +97,44 @@ def parse_monkeys(input):
     monkeys.append(Monkey(id, items, operation, test))
     return monkeys
 
+def keep_away(start, verbose = False):
+    for monkeyi in range(len(start)):
+        monkey = start[monkeyi]
+        print(f"Monkey {monkey.id}:") if verbose else None
+        itemcount = len(monkey.items)
+        for item in monkey.items:
+            monkey.inspections += 1
+            print(f"\tMonkey inspects an item with a worry level of {item}.") if verbose else None
+            new = monkey.operation(item)
+            print(f"\t\tMonkey performs the operation and gets a worry level of {new}.") if verbose else None
+            new //= 3
+            print(f"\t\tMonkey divides the worry level by 3 and gets a worry level of {new}.") if verbose else None
+            if new % monkey.test.condition == 0:
+                print(f"\t\tCurrent worry level is divisible by {monkey.test.condition}.") if verbose else None
+                start[monkey.test.iftrue].items.append(new)
+                print(f"\t\tMonkey throws the item to monkey {monkey.test.iftrue}.") if verbose else None
+            else:
+                print(f"\t\tCurrent worry level is not divisible by {monkey.test.condition}.") if verbose else None
+                start[monkey.test.iffalse].items.append(new)
+                print(f"\t\tMonkey throws the item to monkey {monkey.test.iffalse}.") if verbose else None
+        monkey.items = monkey.items[itemcount:]
+    return start
+
+def perform_rounds(start, rounds, verbose = False):
+    for i in range(rounds):
+        print(f"Round {i + 1}:") if verbose else None
+        start = keep_away(start, False)
+        if verbose:
+            for monkey in start:
+                print(f"\tMonkey {monkey.id}: {monkey.items}")
+    return start
+
+def monkey_business(input, rounds = 20, verbose = False):
+    start = parse_monkeys(input)
+    start = perform_rounds(start, rounds, verbose)
+    start.sort(key = lambda monkey: monkey.inspections, reverse = True)
+    return start[0].inspections * start[1].inspections
+
 def test_cases():
     start = parse_monkeys(sample_input)
     verify(len(start), 4)
@@ -103,6 +142,23 @@ def test_cases():
     verify(start[0].items, [79, 98])
     verify(start[0].operation(2), 38)
     verify(str(start[1]), "Monkey 1: [54, 65, 75, 74] <lambda> Branch: 19 ? 2 : 0")
+    next = keep_away(parse_monkeys(sample_input))
+    verify(len(next), 4)
+    verify(next[0].items, [20, 23, 27, 26])
+    verify(next[1].items, [2080, 25, 167, 207, 401, 1046])
+    verify(next[2].items, [])
+    verify(next[3].items, [])
+    final = perform_rounds(parse_monkeys(sample_input), 20)
+    verify(len(final), 4)
+    verify(final[0].items, [10, 12, 14, 26, 34])
+    verify(final[1].items, [245, 93, 53, 199, 115])
+    verify(final[2].items, [])
+    verify(final[3].items, [])
+    verify(final[0].inspections, 101)
+    verify(final[1].inspections, 95)
+    verify(final[2].inspections, 7)
+    verify(final[3].inspections, 105)
+    verify(monkey_business(sample_input, 20), 10605)
     print("Failed {} out of {} tests. ".format(tests_failed, tests_executed))
 
 if __name__ == "__main__":
