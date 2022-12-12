@@ -1,10 +1,14 @@
 #!/usr/bin/env python3
 
+from functools import reduce
+import operator
+
+
 def execute():
     with open('2022/input/day.11.txt') as inp:
         lines = inp.readlines()
     data = [l.strip() for l in lines]
-    return monkey_business(data)
+    return monkey_business(data), monkey_business(data, 10000, 1)
 
 tests_failed = 0
 tests_executed = 0
@@ -97,7 +101,7 @@ def parse_monkeys(input):
     monkeys.append(Monkey(id, items, operation, test))
     return monkeys
 
-def keep_away(start, verbose = False):
+def keep_away(start, limit_worrying = 3, factor = None, verbose = False):
     for monkeyi in range(len(start)):
         monkey = start[monkeyi]
         print(f"Monkey {monkey.id}:") if verbose else None
@@ -107,7 +111,7 @@ def keep_away(start, verbose = False):
             print(f"\tMonkey inspects an item with a worry level of {item}.") if verbose else None
             new = monkey.operation(item)
             print(f"\t\tMonkey performs the operation and gets a worry level of {new}.") if verbose else None
-            new //= 3
+            new = new // limit_worrying if factor is None else new % factor
             print(f"\t\tMonkey divides the worry level by 3 and gets a worry level of {new}.") if verbose else None
             if new % monkey.test.condition == 0:
                 print(f"\t\tCurrent worry level is divisible by {monkey.test.condition}.") if verbose else None
@@ -120,18 +124,20 @@ def keep_away(start, verbose = False):
         monkey.items = monkey.items[itemcount:]
     return start
 
-def perform_rounds(start, rounds, verbose = False):
+def perform_rounds(start, rounds, limit_worrying = 3, factor = None, verbose = False):
     for i in range(rounds):
-        print(f"Round {i + 1}:") if verbose else None
-        start = keep_away(start, False)
-        if verbose:
+        print(f"Round {i + 1}:") if verbose and ((i+1) % 1000 == 0) else None
+        start = keep_away(start, limit_worrying, factor, False)
+        if verbose and ((i+1) % 1000 == 0):
             for monkey in start:
-                print(f"\tMonkey {monkey.id}: {monkey.items}")
+                print(f"\tMonkey {monkey.id} inspected {monkey.inspections} items.")
     return start
 
-def monkey_business(input, rounds = 20, verbose = False):
+def monkey_business(input, rounds = 20, limit_worrying = 3, verbose = False):
     start = parse_monkeys(input)
-    start = perform_rounds(start, rounds, verbose)
+    # multiply the operation values for all the monkeys
+    factor = reduce(lambda m, s: s.test.condition * m, start, 1) if limit_worrying != 3 else None
+    start = perform_rounds(start, rounds, limit_worrying, factor, verbose)
     start.sort(key = lambda monkey: monkey.inspections, reverse = True)
     return start[0].inspections * start[1].inspections
 
@@ -159,6 +165,7 @@ def test_cases():
     verify(final[2].inspections, 7)
     verify(final[3].inspections, 105)
     verify(monkey_business(sample_input, 20), 10605)
+    verify(monkey_business(sample_input, 10000, 1, True), 2713310158)
     print("Failed {} out of {} tests. ".format(tests_failed, tests_executed))
 
 if __name__ == "__main__":
