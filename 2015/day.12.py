@@ -27,7 +27,17 @@ def sum_the_numbers(json):
     return sum([int(i) for i in re.findall(r'-?\d+', json)])
 
 def sum_the_unred_numbers(json):
-    unred = re.sub(r'{[^{]+?:"red"[^}]*?}', '_', json)
+    unred = json
+    bracket_pairs = []
+    bracket_starts = []
+    for i, c in enumerate(json):
+        if c == '{':
+            bracket_starts.append(i)
+        elif c == '}':
+            bracket_pairs.append((bracket_starts.pop(), i))
+    for p in bracket_pairs:
+        if ':"red"' in unred[p[0]:p[1]]:
+            unred = unred.replace(unred[p[0]:p[1]+1], '{' + (',' * (p[1]-p[0]-1)) + '}')
     return sum_the_numbers(unred)
 
 def test_cases():
