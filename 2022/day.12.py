@@ -4,7 +4,7 @@ def execute():
     with open('2022/input/day.12.txt') as inp:
         lines = inp.readlines()
     data = [l.strip() for l in lines if len(l.strip()) > 0]
-    return shortest_path(data)
+    return shortest_path(data), shortest_path(data, True)
 
 tests_failed = 0
 tests_executed = 0
@@ -28,9 +28,9 @@ acctuvwj
 abdefghi
 """.splitlines()
 
-def shortest_path(data):
+def shortest_path(data, multiple_start=False):
     paths = []
-    visited = []
+    visited = [[]]
     elevations = []
     target = None
     for row, line in enumerate(data):
@@ -41,7 +41,11 @@ def shortest_path(data):
             start = line.index("S")
             cell[start] = 0
             paths[-1][start] = 0
-            visited.append([(row, start)])
+            visited[-1].append((row, start))
+        if multiple_start and (0 in cell):
+            for start in [i for i, x in enumerate(cell) if x == 0]:
+                paths[-1][start] = 0
+                visited[-1].append((row, start))
         if "E" in line:
             end = line.index("E")
             cell[end] = 26
@@ -71,6 +75,7 @@ def shortest_path(data):
 
 def test_cases():
     verify(shortest_path(sample_input), 31)
+    verify(shortest_path(sample_input, True), 29)
     print("Failed {} out of {} tests. ".format(tests_failed, tests_executed))
 
 if __name__ == "__main__":
