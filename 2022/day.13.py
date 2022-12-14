@@ -4,7 +4,8 @@ def execute():
     with open('2022/input/day.13.txt') as inp:
         lines = inp.readlines()
     data = [l for l in lines]
-    return check_order(data)[1]
+    is_in_order, score = check_order(data)
+    return len(is_in_order), len(data), score
 
 tests_failed = 0
 tests_executed = 0
@@ -47,10 +48,12 @@ sample_input = """[1,1,3,1,1]
 """.splitlines()
 
 def is_ordered(first, second):
+    if first is None or second is None:
+        return False
     for i in range(len(first)):
         if i >= len(second):
             return False
-        if type(first[i]) == int and type(second[i]) == int:
+        elif type(first[i]) == int and type(second[i]) == int:
             if first[i] != second[i]:
                 return first[i] < second[i]
         elif type(first[i]) == list and type(second[i]) == list:
@@ -62,10 +65,13 @@ def is_ordered(first, second):
         elif type(first[i]) == list and type(second[i]) == int:
             if not is_ordered(first[i], [second[i]]):
                 return False
+        else:
+            return False
     return True
 
 def check_order(input):
     is_in_order = [False]
+    pairs = [None]
     first, second = None, None
     for line in input:
         if line.startswith("["):
@@ -75,8 +81,10 @@ def check_order(input):
                 second = eval(line)
         if line.strip() == "":
             is_in_order.append(is_ordered(first, second))
+            pairs.append((first, second))
             first, second = None, None
     is_in_order.append(is_ordered(first, second)) # EOL
+    pairs.append((first, second))
                 
     return is_in_order, sum([x for x, i in enumerate(is_in_order) if i])
 
