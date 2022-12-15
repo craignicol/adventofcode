@@ -3,8 +3,8 @@
 def execute():
     with open('2022/input/day.15.txt') as inp:
         lines = inp.readlines()
-    data = [l.strip() for l in lines if len(l.strip()) > 0]
-    return len(data)
+    data = parse_sensor_map([l.strip() for l in lines if len(l.strip()) > 0])
+    return covered_in_row(data, 2000000)
 
 tests_failed = 0
 tests_executed = 0
@@ -50,7 +50,17 @@ def parse_sensor_map(sensor_map):
     return sensors
 
 def covered_in_row(sensor_map, row):
-    return 0
+    covered = set()
+    for s, b in sensor_map:
+        # determine scan area
+        diamonddist = abs(s[0] - b[0]) + abs(s[1] - b[1])
+        if s[1] - diamonddist <= row <= s[1] + diamonddist:
+            # determine scan area
+            x1 = (s[0] - diamonddist) + abs(s[1] - row)
+            x2 = (s[0] + diamonddist) - abs(s[1] - row)
+            for x in range(x1, x2):
+                covered.add((x, row))
+    return len(covered)
 
 def test_cases():
     sensor_map = parse_sensor_map(sample_input)
