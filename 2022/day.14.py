@@ -60,13 +60,40 @@ def parse_walls(walls):
 def count_walls(walls):
     return sum(len([c for c in row if c]) for row in walls)
 
-def print_grid(walls):
-    for row in walls:
-        print(''.join('#' if c else '.' for c in row))
+def print_grid(walls, sand = None):
+    for r, row in enumerate(walls):
+        print(''.join('o' if (c, r) == sand else '#' if col else '.' for c, col in enumerate(row)))
+
+def drop_sand(walls):
+    global sand_start
+    y, x = sand_start
+    # print_grid(walls, (y,x))
+    # print('---')
+    while not walls[x][y]:
+        x += 1
+    # print_grid(walls, (y,x))
+    # print('--')
+    if walls[x][y]:
+        if walls[x][y - 1] and walls[x][y + 1]:
+            x -= 1
+        elif not walls[x+1][y - 1]:
+            y -= 1
+        else:
+            y += 1
+    # print_grid(walls, (y,x))
+    # print('-')
+    walls[x][y] = True
+    return walls
 
 def test_cases():
     print_grid(parse_walls(sample_input))
     verify(count_walls(parse_walls(sample_input)), 20)
+    print_grid(drop_sand(parse_walls(sample_input)))
+    verify(count_walls(drop_sand(parse_walls(sample_input))), 21)
+    w = parse_walls(sample_input)
+    for _ in range(10):
+        w = drop_sand(w)
+        print_grid(w)
     print("Failed {} out of {} tests. ".format(tests_failed, tests_executed))
 
 if __name__ == "__main__":
