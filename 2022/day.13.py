@@ -4,8 +4,8 @@ def execute():
     with open('2022/input/day.13.txt') as inp:
         lines = inp.readlines()
     data = [l for l in lines]
-    is_in_order, score = check_order(data)
-    return len(is_in_order), len(data), score
+    is_in_order, is_correct, score = check_order(data)
+    return is_correct, score
 
 tests_failed = 0
 tests_executed = 0
@@ -57,17 +57,20 @@ def is_ordered(first, second):
             if first[i] != second[i]:
                 return first[i] < second[i]
         elif type(first[i]) == list and type(second[i]) == list:
-            if not is_ordered(first[i], second[i]):
-                return False
+            result = is_ordered(first[i], second[i])
+            if result is not None:
+                return result
         elif type(first[i]) == int and type(second[i]) == list:
-            if not is_ordered([first[i]], second[i]):
-                return False
+            result = is_ordered([first[i]], second[i])
+            if result is not None:
+                return result
         elif type(first[i]) == list and type(second[i]) == int:
-            if not is_ordered(first[i], [second[i]]):
-                return False
+            result = is_ordered(first[i], [second[i]])
+            if result is not None:
+                return result
         else:
             return False
-    return True
+    return None if len(first) == len(second) else True
 
 def check_order(input):
     is_in_order = [False]
@@ -86,10 +89,10 @@ def check_order(input):
     is_in_order.append(is_ordered(first, second)) # EOL
     pairs.append((first, second))
                 
-    return is_in_order, sum([x for x, i in enumerate(is_in_order) if i])
+    return is_in_order, [x for x, i in enumerate(is_in_order) if i], sum([x for x, i in enumerate(is_in_order) if i])
 
 def test_cases():
-    is_in_order, score = check_order(sample_input)
+    is_in_order, _, score = check_order(sample_input)
     verify(len(is_in_order), 9)
     verify(is_in_order[1], True)
     verify(is_in_order[2], True)
