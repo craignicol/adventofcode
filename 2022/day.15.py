@@ -4,7 +4,7 @@ def execute():
     with open('2022/input/day.15.txt') as inp:
         lines = inp.readlines()
     data = parse_sensor_map([l.strip() for l in lines if len(l.strip()) > 0])
-    return covered_in_row(data, 2000000),tuning_frequency(data)
+    return covered_in_row(data, 2000000)[0],tuning_frequency(data)
 
 tests_failed = 0
 tests_executed = 0
@@ -69,19 +69,33 @@ def covered_in_row(sensor_map, row):
             covered.pop(i+1)
         else:
             i += 1
-    return sum([b - a for (a,b) in covered])
+    return sum([b - a for (a,b) in covered]), covered
 
 def tuning_frequency(sensor_map):
     location = (0, 0)
+    area = (0, 0, 0, 0)
     for s, b in sensor_map:
-        diamond_dist = abs(s[0] - b[0]) + abs(s[1] - b[1])
-        # print(diamond_dist)
+        if s[0] > area[2]:
+            area = (area[0], area[1], s[0], area[3])
+        if s[0] < area[0]:
+            area = (s[0], area[1], area[2], area[3])
+        if s[1] > area[3]:
+            area = (area[0], area[1], area[2], s[1])
+        if s[1] < area[1]:
+            area = (area[0], s[1], area[2], area[3])
+
+    for row in range(area[1], area[3] + 1):
+        _, covered = covered_in_row(sensor_map, row)
+        if len(covered) > 1:
+            location = (covered[0][1] + 1, row)
+            break
+    # print(diamond_dist)
     return location[0] * 4000000 + location[1]
 
 def test_cases():
     sensor_map = parse_sensor_map(sample_input)
     verify(sensor_map[0], ((2, 18), (-2, 15)))
-    verify(covered_in_row(sensor_map, 10), 26)
+    verify(covered_in_row(sensor_map, 10)[0], 26)
     verify(tuning_frequency(sensor_map), 56000011)
     print("Failed {} out of {} tests. ".format(tests_failed, tests_executed))
 
