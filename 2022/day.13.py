@@ -5,7 +5,7 @@ def execute():
         lines = inp.readlines()
     data = [l for l in lines]
     is_in_order, is_correct, score = check_order(data)
-    return is_correct, score
+    return is_correct, score, decoder_key(data)
 
 tests_failed = 0
 tests_executed = 0
@@ -91,6 +91,18 @@ def check_order(input):
                 
     return is_in_order, [x for x, i in enumerate(is_in_order) if i], sum([x for x, i in enumerate(is_in_order) if i])
 
+def decoder_key(input):
+    before_2 = 1
+    before_6 = 2 # we know 2 is before 6
+    for line in input:
+        if line.startswith("["):
+            first = eval(line)
+            if is_ordered(first, [[2]]):
+                before_2 += 1
+            if is_ordered(first, [[6]]):
+                before_6 += 1
+    return before_2 * before_6
+
 def test_cases():
     is_in_order, _, score = check_order(sample_input)
     verify(len(is_in_order), 9)
@@ -103,6 +115,7 @@ def test_cases():
     verify(is_in_order[7], False)
     verify(is_in_order[8], False)
     verify(score, 13)
+    verify(decoder_key(sample_input), 140)
     print("Failed {} out of {} tests. ".format(tests_failed, tests_executed))
 
 if __name__ == "__main__":
