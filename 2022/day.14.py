@@ -4,7 +4,7 @@ def execute():
     with open('2022/input/day.14.txt') as inp:
         lines = inp.readlines()
     data = [l.strip() for l in lines if len(l.strip()) > 0]
-    return drop_all_sand(data)[1]
+    return drop_all_sand(data)[1], drop_until_blocked(data)[1]
 
 tests_failed = 0
 tests_executed = 0
@@ -27,7 +27,7 @@ sample_input = """498,4 -> 498,6 -> 496,6
 
 sand_start = (500, 0)
 
-def parse_walls(walls):
+def parse_walls(walls, with_ground = False):
     global sand_start
     corners = []
     minx, maxx, miny = 500, 500, 0
@@ -45,6 +45,11 @@ def parse_walls(walls):
         corners.append(thiswall)
     minx -= 1
     maxx += 1
+    if with_ground:
+        miny += 2
+        minx = 500 - miny - 2
+        maxx = 500 + miny + 2
+        corners.append([(minx, miny), (maxx, miny)])
     grid = [[False] * (maxx - minx + 1) for _ in range(miny + 1)]
     for wall in corners:
         for i in range(len(wall) - 1):
@@ -102,6 +107,19 @@ def drop_all_sand(walls):
         # print('---')
     return walls, sand_count - 1
 
+def drop_until_blocked(walls):
+    walls, sand_start = parse_walls(walls, True)
+    next_sand = (0,0)
+    sand_count = 0
+    while next_sand != sand_start:
+        walls, next_sand = drop_sand(walls)
+        sand_count += 1
+        if sand_start is None:
+            break
+        # print_grid(walls, sand_start)
+        # print('---')
+    return walls, sand_count
+
 def test_cases():
     start = parse_walls(sample_input)[0]
     print_grid(start)
@@ -111,6 +129,9 @@ def test_cases():
     w, sand_count = drop_all_sand(sample_input)
     print_grid(w)
     verify(sand_count, 24)
+    w, sand_count = drop_until_blocked(sample_input)
+    print_grid(w)
+    verify(sand_count, 93)
     print("Failed {} out of {} tests. ".format(tests_failed, tests_executed))
 
 if __name__ == "__main__":
