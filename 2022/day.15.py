@@ -4,7 +4,7 @@ def execute():
     with open('2022/input/day.15.txt') as inp:
         lines = inp.readlines()
     data = parse_sensor_map([l.strip() for l in lines if len(l.strip()) > 0])
-    return covered_in_row(data, 2000000)
+    return covered_in_row(data, 2000000),tuning_frequency(data)
 
 tests_failed = 0
 tests_executed = 0
@@ -50,7 +50,7 @@ def parse_sensor_map(sensor_map):
     return sensors
 
 def covered_in_row(sensor_map, row):
-    covered = set()
+    covered = []
     for s, b in sensor_map:
         # determine scan area
         diamonddist = abs(s[0] - b[0]) + abs(s[1] - b[1])
@@ -58,14 +58,31 @@ def covered_in_row(sensor_map, row):
             # determine scan area
             x1 = (s[0] - diamonddist) + abs(s[1] - row)
             x2 = (s[0] + diamonddist) - abs(s[1] - row)
-            for x in range(x1, x2):
-                covered.add((x, row))
-    return len(covered)
+            covered.append((x1, x2))
+    comparator = lambda a: a[0]
+    covered.sort(key=comparator)
+    # merge overlapping areas
+    i = 0
+    while i < len(covered) - 1:
+        if covered[i][1] >= covered[i+1][0]:
+            covered[i] = (covered[i][0], max(covered[i][1], covered[i+1][1]))
+            covered.pop(i+1)
+        else:
+            i += 1
+    return sum([b - a for (a,b) in covered])
+
+def tuning_frequency(sensor_map):
+    location = (0, 0)
+    for s, b in sensor_map:
+        diamond_dist = abs(s[0] - b[0]) + abs(s[1] - b[1])
+        # print(diamond_dist)
+    return location[0] * 4000000 + location[1]
 
 def test_cases():
     sensor_map = parse_sensor_map(sample_input)
     verify(sensor_map[0], ((2, 18), (-2, 15)))
     verify(covered_in_row(sensor_map, 10), 26)
+    verify(tuning_frequency(sensor_map), 56000011)
     print("Failed {} out of {} tests. ".format(tests_failed, tests_executed))
 
 if __name__ == "__main__":
