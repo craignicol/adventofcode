@@ -30,6 +30,24 @@ def parse_blueprints(lines):
             }
     return blueprints
 
+def max_geodes(blueprint, minutes):
+    orebots = 1
+    claybots = obsidianbots = geodebots = 0
+    ore = clay = obsidian = geode = 0
+    for i in range(minutes):
+        
+        ore += orebots
+        clay += claybots
+        obsidian += obsidianbots
+        geode += geodebots
+
+
+def total_quantity(blueprints, minutes):
+    score = 0
+    for name, bp in blueprints:
+        score += name * max_geodes(bp, minutes)
+    return score
+
 def verify(a, b):
     global tests_executed
     global tests_failed
@@ -46,6 +64,9 @@ def test_cases():
     blueprints = parse_blueprints(sample_input)
     verify(blueprints[1]['ore'], [(4, 'ore')])
     verify(blueprints[2]['geode'], [(3, 'ore'), (12, 'obsidian')])
+    verify(max_geodes(blueprints[1], 24), 9)
+    verify(max_geodes(blueprints[2], 24), 12)
+    verify(total_quantity(sample_input, 24), 33)
     print("Failed {} out of {} tests. ".format(tests_failed, tests_executed))
 
 if __name__ == "__main__":
