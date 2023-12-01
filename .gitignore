@@ -106,3 +106,4 @@ venv.bak/
 # advent of code
 input.*
 output.*
+2023/input/*
