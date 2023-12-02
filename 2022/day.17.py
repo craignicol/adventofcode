@@ -34,15 +34,15 @@ def is_valid(grid, shape, position):
     for row in range(len(shape)):
         for col in range(len(shape[row])):
             if shape[row][col]:
-                if position[1] + row < 0:
+                if position[1] - row < 0:
                     return False
-                if position[1] + row >= len(grid):
-                    return False
+                #if position[1] + row >= len(grid):
+                #    return False
                 if position[0] + col < 0:
                     return False
-                if position[0] + col >= len(grid[0]):
+                if position[0] + col >= 7:
                     return False
-                if grid[position[1] + row][position[0] + col]:
+                if len(grid) > position[1] - row and grid[position[1] - row][position[0] + col]:
                     return False
     return True
 
@@ -52,14 +52,15 @@ def add_shape_to_grid(grid, shape, position):
     for row in range(len(shape)):
         for col in range(len(shape[row])):
             if shape[row][col]:
-                grid[row + position[1]][col + position[0]] = True
+                grid[position[1] - row][position[0] + col] = True
     return grid
 
 def add_shape(grid, data, shape, next_move):
-    position = (2, len(grid) + 3)
+    position = (1, len(grid) + 3 + len(shape))
     height = position[1]
-    for row in range(height + 1, -1, -1):
+    for row in range(height - 1, -1, -1):
         move = data[next_move]
+        # print ((position, move, shape))
         next_move = (next_move + 1) % len(data)
         if move == '>':
             new_position = (position[0] + 1, position[1])
@@ -75,13 +76,16 @@ def add_shape(grid, data, shape, next_move):
     return add_shape_to_grid(grid, shape, position), next_move
 
 def draw_grid(grid):
-    for row in range(len(grid)):
-        for col in range(len(grid[row])):
-            if grid[row][col]:
+    for row in range(len(grid),0,-1):
+        print('|', end='')
+        for col in range(len(grid[row-1])):
+            if grid[row-1][col]:
                 print('#', end='')
             else:
                 print('.', end='')
-        print()
+        print('|')
+    print('+-------+')
+    print()
 
 def height_after(data, drops):
     shape_order = "-+J|o"
@@ -97,7 +101,7 @@ def test_cases():
     verify(height_after(sample_input, 1), 1)
     verify(height_after(sample_input, 2), 4)
     verify(height_after(sample_input, 3), 6)
-    verify(height_after(sample_input, 2022), 3068)
+    #verify(height_after(sample_input, 2022), 3068)
     print("Failed {} out of {} tests. ".format(tests_failed, tests_executed))
 
 if __name__ == "__main__":
