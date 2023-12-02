@@ -1,10 +1,13 @@
 #!/usr/bin/env python3
 
+import math
+
+
 def execute():
     with open('2022/input/day.21.txt') as inp:
         lines = inp.readlines()
     data = [l.strip() for l in lines if len(l.strip()) > 0]
-    return calculate_root(data)
+    return calculate_root(data), root_equality(data)
 
 tests_failed = 0
 tests_executed = 0
@@ -60,7 +63,7 @@ def aggregate(x, op, y):
         return x / y
 
 def calculate(equation, program):
-    if type(equation) == type(1): # int
+    if type(equation) != type([]): # number
         return equation    
     else:
         return aggregate(calculate(program[equation[0]], program), equation[1], calculate(program[equation[2]], program))
@@ -69,8 +72,47 @@ def calculate_root(program):
     ram = parse_program(program)
     return calculate(ram['root'], ram)
 
+def find_humn(target, var, program):
+    if var == 'humn':
+        return target
+    
+    eq = program[var]
+    if type(eq) == type([]):
+        x,y = calculate(program[eq[0]], program), calculate(program[eq[2]], program)
+        if math.isnan(x):
+            if eq[1] == '+':
+                return find_humn(target - y, eq[0], program) # target = ? + y
+            elif eq[1] == '-':
+                return find_humn(target + y, eq[0], program) # target = ? - y
+            elif eq[1] == '*':
+                return find_humn(target / y, eq[0], program) # target = ? * y
+            elif eq[1] == '/':
+                return find_humn(target * y, eq[0], program) # target = ? / y
+        else:
+            if eq[1] == '+':
+                return find_humn(target - x, eq[2], program) # target = x + ?
+            elif eq[1] == '-':
+                return find_humn(x - target, eq[2], program) # target = x - ?
+            elif eq[1] == '*':
+                return find_humn(target / x, eq[2], program) # target = x * ?
+            elif eq[1] == '/':
+                return find_humn(x / target, eq[2], program) # target = x / ?
+    return math.nan
+
+def root_equality(program):
+    ram = parse_program(program)
+    root = ram['root']
+    ram['humn'] = float('NaN')
+    # Need to find value of humn that makes ram[0] == ram[2]
+    x,y = calculate(ram[root[0]], ram), calculate(ram[root[2]], ram)
+    if math.isnan(x):
+        return find_humn(y, root[0], ram)
+    else:
+        return find_humn(x, root[2], ram)
+
 def test_cases():
     verify(calculate_root(sample_input.splitlines()), 152)
+    verify(root_equality(sample_input.splitlines()), 301)
     print("Failed {} out of {} tests. ".format(tests_failed, tests_executed))
 
 if __name__ == "__main__":
