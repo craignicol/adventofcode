@@ -40,7 +40,7 @@ def find_adjacent_numbers(line, symbols, with_position = False):
             near_symbol = near_symbol or (idx in sym) 
         if c not in '0123456789':
             if near_symbol and in_number:
-                numbers.append((current, idx - len(str(current)) - 1, idx + 1)) if with_position else numbers.append(current)
+                numbers.append((current, idx - len(str(current)) - 1, idx)) if with_position else numbers.append(current)
             current = 0
             in_number = False
             near_symbol = False
