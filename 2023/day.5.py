@@ -3,8 +3,8 @@
 def execute():
     with open('2023/input/day.5.txt') as inp:
         lines = inp.readlines()
-    data = [l.strip() for l in lines]
-    return lowest_location(parse(data))
+    data = parse([l.strip() for l in lines])
+    return lowest_location(data), get_locations_with_spread(data)
 
 tests_failed = 0
 tests_executed = 0
@@ -79,8 +79,8 @@ def get_soil(alm):
     return translate(seeds, alm['seed-to-soil'])
 
 def get_locations(alm):
-    nxt = get_soil(alm)
-    for mapping in ['soil-to-fertilizer', 'fertilizer-to-water', 'water-to-light', 'light-to-temperature', 'temperature-to-humidity', 'humidity-to-location']:
+    nxt = get_seeds(alm)
+    for mapping in ['seed-to-soil', 'soil-to-fertilizer', 'fertilizer-to-water', 'water-to-light', 'light-to-temperature', 'temperature-to-humidity', 'humidity-to-location']:
         nxt = translate(nxt, alm[mapping])
     return nxt
 
@@ -95,6 +95,46 @@ def translate(src, mapping):
         if src >= src_start and src < src_start + range_len:
             return dest_start + (src - src_start)
     return src
+
+def get_seeds_with_spread(alm):
+    seeds = get_seeds(alm)
+    spread = []
+    for i in range(0, len(seeds), 2):
+        spread.append((seeds[i], seeds[i] + seeds[i+1] - 1))
+    return spread
+
+def translate_with_spread(src, mapping):
+    result = []
+    to_map = src[:]
+    while len(to_map) > 0:
+        a, b = to_map.pop()
+        is_added = False
+        for m in mapping:
+            dest_start, src_start, range_len = m
+            if a >= src_start and a < src_start + range_len:
+                if (b < src_start + range_len):
+                    result.append((dest_start + (a - src_start), dest_start + (b - src_start)))
+                    is_added = True
+                else:
+                    result.append((dest_start + (a - src_start), dest_start + range_len - 1))
+                    to_map.append((a + range_len, b))
+                    is_added = True
+            elif b >= src_start and b < src_start + range_len:
+                result.append((a, src_start - 1))
+                to_map.append((src_start, b))
+                is_added = True
+        if not is_added:
+            result.append((a, b))
+    return result
+
+def get_locations_with_spread(alm):
+    nxt = get_seeds_with_spread(alm)
+    for mapping in ['seed-to-soil', 'soil-to-fertilizer', 'fertilizer-to-water', 'water-to-light', 'light-to-temperature', 'temperature-to-humidity', 'humidity-to-location']:
+        nxt = translate_with_spread(nxt, alm[mapping])
+    return nxt
+
+def lowest_location_with_spread(alm):
+    return min([a for (a,b) in get_locations_with_spread(alm)])
 
 def test_cases():
     alm = parse(sample_input)
@@ -112,6 +152,9 @@ def test_cases():
     verify(get_soil(alm), [81, 14, 57, 13])
     verify(get_locations(alm), [82, 43, 86, 35])
     verify(lowest_location(alm), 35)
+    verify(get_seeds_with_spread(alm), [(79,92),(55,67)])
+    #verify(get_locations_with_spread(alm), 46)
+    verify(lowest_location_with_spread(alm), 46)
     print("Failed {} out of {} tests. ".format(tests_failed, tests_executed))
 
 if __name__ == "__main__":
