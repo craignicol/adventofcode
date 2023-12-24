@@ -9,7 +9,7 @@ def execute():
     with open('2023/input/day.6.txt') as inp:
         lines = inp.readlines()
     data = [l.strip() for l in lines if len(l.strip()) > 0]
-    return margin_of_error(data)
+    return margin_of_error(data), wins([l.replace(' ', '') for l in data])
 
 tests_failed = 0
 tests_executed = 0
@@ -49,6 +49,7 @@ def margin_of_error(records):
 def test_cases():
     verify(wins(sample_input.splitlines()), [4, 8, 9])
     verify(margin_of_error(sample_input.splitlines()), 288)
+    verify(wins(sample_input.replace(' ', '').splitlines())[0], 71503)
     print("Failed {} out of {} tests. ".format(tests_failed, tests_executed))
 
 if __name__ == "__main__":
