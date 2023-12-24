@@ -4,7 +4,7 @@ def execute():
     with open('2023/input/day.5.txt') as inp:
         lines = inp.readlines()
     data = parse([l.strip() for l in lines])
-    return lowest_location(data), get_locations_with_spread(data)
+    return lowest_location(data), lowest_location_with_spread(data)
 
 tests_failed = 0
 tests_executed = 0
@@ -120,7 +120,7 @@ def translate_with_spread(src, mapping):
                     to_map.append((a + range_len, b))
                     is_added = True
             elif b >= src_start and b < src_start + range_len:
-                result.append((a, src_start - 1))
+                to_map.append((a, src_start - 1))
                 to_map.append((src_start, b))
                 is_added = True
         if not is_added:
