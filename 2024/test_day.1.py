@@ -4,8 +4,23 @@ import unittest
 import typing
 
 class Test(unittest.TestCase):
+    data1 = """3   4
+4   3
+2   5
+1   3
+3   9
+3   3""".splitlines()
+
+    data_single = "1   3".splitlines()
+
     def test_run(self):
         self.assertTrue(True)
+
+    def test_given_example(self):
+        self.assertEqual(11, Elf().solve(self.data1))
+
+    def test_single(self):
+        self.assertEqual(2, Elf().solve(self.data_single))
 
     def test_result(self):
         self.assertEqual(0, Elf().execute())
