@@ -107,3 +107,4 @@ venv.bak/
 input.*
 output.*
 2023/input/*
+**/input/*

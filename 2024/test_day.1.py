@@ -27,7 +27,7 @@ class Test(unittest.TestCase):
 
 class Elf():
     def open_file(self) -> list[str]:
-        with open('2024/input/day.0.txt') as inp:
+        with open('2024/input/day.1.txt') as inp:
             lines = inp.readlines()
         return [l.strip() for l in lines if len(l.strip()) > 0]
 
@@ -35,7 +35,11 @@ class Elf():
         return self.solve(self.open_file())
 
     def solve(self, data: list[str]) -> int:
-        return len(data)
+        if len(data) < 1:
+            return 0
+        pairs = [tuple([int(n) for n in d.split()]) for d in data]
+        l1, l2 = [sorted(list(p)) for p in zip(*pairs)]
+        return sum([abs(z[0] - z[1]) for z in zip(l1, l2)])
 
 if __name__ == "__main__":
     unittest.main()
