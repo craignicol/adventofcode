@@ -1,4 +1,13 @@
 {
   "files.autoSave": "afterDelay",
-  "files.autoSaveDelay": 250  
+  "files.autoSaveDelay": 250,
+  "python.testing.unittestArgs": [
+    "-v",
+    "-s",
+    "./2024",
+    "-p",
+    "test_*.py"
+  ],
+  "python.testing.pytestEnabled": false,
+  "python.testing.unittestEnabled": true
 }
