@@ -47,24 +47,23 @@ class Elf():
     def execute(self) -> int:
         return self.solve(self.open_file())
 
-    def is_safe(self, report: str, dampened: bool = False) -> bool:
+    def is_safe(self, report: str) -> bool:
         levels = [int(l) for l in report.split()]
+        if self.is_safe_int(levels):
+            return True
+        for i in range(len(levels)):
+            if self.is_safe_int(levels[:i] + levels[i+1:]):
+                return True
+        return False
+
+    def is_safe_int(self, levels: list[int]) -> bool:
+        if levels[0] == levels[1]:
+            return False
         direction = +1 if levels[1] - levels[0] > 0 else -1
-        i = 1
-        while i < (len(levels)):
+        for i in range(1,len(levels)):
             diff = (levels[i] - levels[i-1]) * direction
             if diff < 1 or diff > 3:
-                if dampened:
-                    return False
-                if i == len(levels) - 1:
-                    return True
-                diff = (levels[i+1] - levels[i-1]) * direction # skip i
-                if diff < 1 or diff > 3:
-                    return self.is_safe(' '.join([str(l) for l in levels[1:]]), True) or \
-                           self.is_safe(' '.join([str(levels[0])] +[str(l) for l in levels[2:]]), True)
-                dampened = True
-                i += 1
-            i += 1
+                return False
         return True
 
     def solve(self, data: list[str]) -> int:
