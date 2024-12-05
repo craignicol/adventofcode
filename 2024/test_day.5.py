@@ -39,8 +39,12 @@ class Test(unittest.TestCase):
     def test_result(self):
         self.assertEqual(0, Elf().execute())
 
+    def test_result_b(self):
+        self.assertEqual(0, Elf().execute_fix())
+
     def test_example_data(self):
         self.assertEqual(143, Elf().solve(self.data))
+        self.assertEqual(123, Elf().fix(self.data))
 
     def test_update_per_page(self):
         sut = Print(self.data)
@@ -62,8 +66,14 @@ class Elf():
     def execute(self) -> int:
         return self.solve(self.open_file())
 
+    def execute_fix(self) -> int:
+        return self.fix(self.open_file())
+
     def solve(self, data: list[str]) -> int:
         return Print(data).score_all_updates()
+
+    def fix(self, data: list[str]) -> int:
+        return Print(data).fix()
     
 class Print():
     rules: set[tuple[int,int]]
@@ -97,8 +107,27 @@ class Print():
                     return False
         return True
 
-    def score_all_updates(self) -> bool:
+    def score_all_updates(self) -> int:
         valid_updates = [p for p in self.pages if self.valid_update(p)]
+        middle_pages = [p[len(p)//2] for p in valid_updates]
+        return sum(middle_pages)
+
+    def fix_update(self, pages: list[int]) -> list[int]:
+        updated = pages[:]
+        while not self.valid_update(updated):
+            for i in range(len(pages)):
+                for j in range(i+1, len(pages)):
+                    p = updated[i]
+                    q = updated[j]
+                    if (q,p) in self.rules:
+                        updated[i] = q
+                        updated[j] = p
+                        break
+        return updated
+
+    def fix(self) -> int:
+        invalid_updates = [p for p in self.pages if not self.valid_update(p)]
+        valid_updates = [self.fix_update(p) for p in invalid_updates]
         middle_pages = [p[len(p)//2] for p in valid_updates]
         return sum(middle_pages)
 
