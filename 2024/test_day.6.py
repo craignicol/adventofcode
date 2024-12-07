@@ -38,13 +38,12 @@ class Elf():
         return Map(data).steps_to_exit()
 
 class Map():
-    bounds: tuple[int,int,int,int] = (0,0,0,0)
-    obstacles: set[tuple[int,int]] = set()
-    start: tuple[int,int] = (0,0)
     directions: list[tuple[int,int]] = [(-1,0),(0,1), (1,0), (0,-1)] # up, right, down, left
-    path_taken: set[tuple[int,int]] = set() #we only one to count each square once
 
     def __init__(self, data: list[str]):
+        self.bounds: tuple[int,int,int,int] = (0,0,0,0)
+        self.obstacles: set[tuple[int,int]] = set()
+        self.start: tuple[int,int] = (0,0)
         self.path_taken = set()
         self.parse(data)
 
@@ -61,7 +60,6 @@ class Map():
                     print('.', end='')
             print()
         return ''
-
 
     def parse(self, data: list[str]):
         for i, r in enumerate(data):
