@@ -4,11 +4,16 @@ import unittest
 import typing
 
 class Test(unittest.TestCase):
+    data = """""".splitlines()
+
     def test_run(self):
         self.assertTrue(True)
 
     def test_result(self):
         self.assertEqual(0, Elf().execute())
+
+    def test_data(self):
+        self.assertEqual(0, Elf().solve(self.data))
 
 class Elf():
     def open_file(self) -> list[str]:
