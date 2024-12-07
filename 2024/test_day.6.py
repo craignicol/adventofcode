@@ -45,6 +45,7 @@ class Map():
     path_taken: set[tuple[int,int]] = set() #we only one to count each square once
 
     def __init__(self, data: list[str]):
+        self.path_taken = set()
         self.parse(data)
 
     def __repr__(self) -> str:
@@ -72,7 +73,6 @@ class Map():
         self.bounds = (0, len(data), 0, len(data[0]))
 
     def steps_to_exit(self) -> int:
-        self.path_taken = set()
         position = self.start
         direction = 0
         while position[0] >= self.bounds[0] and position[0] < self.bounds[1] and position[1] >= self.bounds[2] and position[1] < self.bounds[3]:
