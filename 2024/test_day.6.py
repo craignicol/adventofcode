@@ -44,12 +44,23 @@ class Map():
     directions: list[tuple[int,int]] = [(-1,0),(0,1), (1,0), (0,-1)] # up, right, down, left
     path_taken: set[tuple[int,int]] = set() #we only one to count each square once
 
-
     def __init__(self, data: list[str]):
         self.parse(data)
 
     def __repr__(self) -> str:
-        return "Map(" + str(self.bounds) + ", " + str(self.obstacles) + ", " + str(self.start) + ")"
+        for i in range(self.bounds[0], self.bounds[1]):
+            for j in range(self.bounds[2], self.bounds[3]):
+                if (i,j) in self.obstacles:
+                    print('#', end='')
+                elif (i,j) == self.start:
+                    print('^', end='')
+                elif (i,j) in self.path_taken:
+                    print('X', end='')
+                else:
+                    print('.', end='')
+            print()
+        return ''
+
 
     def parse(self, data: list[str]):
         for i, r in enumerate(data):
@@ -61,6 +72,7 @@ class Map():
         self.bounds = (0, len(data), 0, len(data[0]))
 
     def steps_to_exit(self) -> int:
+        self.path_taken = set()
         position = self.start
         direction = 0
         while position[0] >= self.bounds[0] and position[0] < self.bounds[1] and position[1] >= self.bounds[2] and position[1] < self.bounds[3]:
@@ -68,9 +80,9 @@ class Map():
             if next in self.obstacles:
                 direction = (direction + 1) % len(self.directions) #turn right
             else:
-                position = next #move forward
                 self.path_taken.add(position)
-        return len(self.path_taken) - 1 # Last step takes us outside
+                position = next #move forward
+        return len(self.path_taken)
 
     def next_position(self, position: tuple[int,int], direction: int) -> tuple[int,int]:
         d = self.directions[direction]
