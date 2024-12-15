@@ -21,9 +21,13 @@ class Test(unittest.TestCase):
     def test_result(self):
         self.assertLess(Elf().execute(), 5445)
         self.assertEqual(0, Elf().execute())
+        self.assertEqual(0, Elf().execute_obstacles())
 
     def test_data(self):
         self.assertEqual(41, Elf().solve(self.data))
+
+    def test_data(self):
+        self.assertEqual(6, Elf().solve_obstacles(self.data))
 
 class Elf():
     def open_file(self) -> list[str]:
@@ -33,9 +37,15 @@ class Elf():
 
     def execute(self) -> int:
         return self.solve(self.open_file())
+    
+    def execute_obstacles(self) -> int:
+        return self.solve_obstacles(self.open_file())
 
     def solve(self, data: list[str]) -> int:
         return Map(data).steps_to_exit()
+    
+    def solve_obstacles(self, data: list[str]) -> int:
+        return Map(data).place_obstacles()
 
 class Map():
     directions: list[tuple[int,int]] = [(-1,0),(0,1), (1,0), (0,-1)] # up, right, down, left
@@ -45,6 +55,7 @@ class Map():
         self.obstacles: set[tuple[int,int]] = set()
         self.start: tuple[int,int] = (0,0)
         self.path_taken = set()
+        self.crossovers = 0
         self.parse(data)
 
     def __repr__(self) -> str:
@@ -78,6 +89,8 @@ class Map():
             if next in self.obstacles:
                 direction = (direction + 1) % len(self.directions) #turn right
             else:
+                if next in self.path_taken:
+                    self.crossovers += 1
                 self.path_taken.add(position)
                 position = next #move forward
         return len(self.path_taken)
@@ -85,6 +98,10 @@ class Map():
     def next_position(self, position: tuple[int,int], direction: int) -> tuple[int,int]:
         d = self.directions[direction]
         return (position[0] + d[0], position[1] + d[1])
+
+    def place_obstacles(self) -> int:
+        self.steps_to_exit()
+        return self.crossovers
         
 if __name__ == "__main__":
     unittest.main()
