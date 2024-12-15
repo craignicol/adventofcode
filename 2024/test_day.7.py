@@ -22,6 +22,7 @@ class Test(unittest.TestCase):
 
     def test_data(self):
         self.assertEqual(3749, Elf().solve(self.data))
+        self.assertEqual(11387, Elf().solve_concat(self.data))
 
     def test_is_possible(self):
         expected = [True, True, False, False, False, False, False, False, True]
@@ -30,17 +31,28 @@ class Test(unittest.TestCase):
             with self.subTest(i=i):
                 self.assertEqual(expected[i], Elf().is_possible(self.data[i]) > 0)
 
+    def test_is_possible_concat(self):
+        expected = [True, True, False, True, True, False, True, False, True]
+
+        for i in range(0, len(self.data)):
+            with self.subTest(i=i):
+                self.assertEqual(expected[i], Elf().is_possible_concat(self.data[i]) > 0)
+
+
 class Elf():
     def open_file(self) -> list[str]:
         with open('2024/input/day.7.txt') as inp:
             lines = inp.readlines()
         return [l.strip() for l in lines if len(l.strip()) > 0]
 
-    def execute(self) -> int:
-        return self.solve(self.open_file())
+    def execute(self) -> tuple[int, int]:
+        return self.solve(self.open_file()), self.solve_concat(self.open_file())
 
     def solve(self, data: list[str]) -> int:
         return sum([self.is_possible(d) for d in data])
+
+    def solve_concat(self, data: list[str]) -> int:
+        return sum([self.is_possible_concat(d) for d in data])
 
     def is_possible(self, data: str) -> bool:
         target, values = data.split(':')
@@ -54,7 +66,21 @@ class Elf():
                 next.append(r * v)
             results = next
         return target if target in results else 0
-    
+
+    def is_possible_concat(self, data: str) -> bool:
+        target, values = data.split(':')
+        target = int(target)
+        values = [int(v) for v in values.split()]
+        results = [values[0]]
+        for v in values[1:]:
+            next = []
+            for r in results:
+                next.append(r + v)
+                next.append(r * v)
+                next.append(int(str(r) + str(v)))
+            results = next
+        return target if target in results else 0
+
 if __name__ == "__main__":
     unittest.main()
     print(Elf().execute())
