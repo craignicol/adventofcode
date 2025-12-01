@@ -2,6 +2,7 @@
 
 import unittest
 import typing
+from parameterized import parameterized
 
 class Test(unittest.TestCase):
     data = """""".splitlines()
@@ -14,6 +15,12 @@ class Test(unittest.TestCase):
 
     def test_data(self):
         self.assertEqual(0, Elf().solve(self.data))
+
+    @parameterized.expand([
+        [0, []],
+    ])
+    def test_examples(self, expected, input):
+        self.assertEqual(expected, Elf().solve(input))
 
 class Elf():
     def open_file(self) -> list[str]:
