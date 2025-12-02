@@ -47,7 +47,7 @@ L82""".splitlines()
 
 class Elf():
     def open_file(self) -> list[str]:
-        with open('2025/input/day.0.txt') as inp:
+        with open('2025/input/day.1.txt') as inp:
             lines = inp.readlines()
         return [l.strip() for l in lines if len(l.strip()) > 0]
 
@@ -57,17 +57,31 @@ class Elf():
     def solve(self, data: list[str]) -> int:
         arrow_pos = 50
         zero_count = 0
+        ignore_next = False
         for step in data:
             if step[0] == "L":
                 arrow_pos -= int(step[1:])
+                if ignore_next:
+                    ignore_next = False
+                    if arrow_pos < 0:
+                        arrow_pos += 100
+                while arrow_pos < 0:
+                    arrow_pos += 100
+                    zero_count += 1
+                if arrow_pos == 0:                       
+                    zero_count += 1
+                    ignore_next = True
             elif step[0] == "R":
                 arrow_pos += int(step[1:])
-            dm = divmod(arrow_pos, 100)
-            (cnt, arrow_pos) = dm
-            # print(dm)
-            if arrow_pos == 0 and cnt == 0:
-                zero_count += 1
-            zero_count += abs(cnt)
+                if ignore_next:
+                    ignore_next = False
+                    if arrow_pos >= 100:
+                        arrow_pos -= 100
+                while arrow_pos >= 100:
+                    arrow_pos -= 100
+                    zero_count += 1
+                if arrow_pos == 0:
+                    ignore_next = True
         return zero_count
 
 if __name__ == "__main__":
