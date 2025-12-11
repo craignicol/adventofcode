@@ -14,11 +14,11 @@ class Test(unittest.TestCase):
         self.assertTrue(True)
 
     def test_result(self):
-        self.assertEqual(0, Elf().execute(2))
+        self.assertEqual(0, Elf().execute(12))
 
     def test_data(self):
         self.assertEqual(357, Elf().solve(self.data))
-        self.assertEqual(1, Elf().solve(self.data))
+        self.assertEqual(3121910778619, Elf().solve(self.data, 12))
 
     @parameterized.expand([
         [98, ["987654321111111"]],
@@ -54,10 +54,11 @@ class Elf():
         largest = ""
         last_idx = 0
         for n in range(window-1, 0, -1):
-            nxt, nxt_idx = max(batteries[last_idx:-n]), batteries.index(max(batteries[last_idx:-n]))
+            nxt, nxt_idx = max(batteries[:-n]), batteries.index(max(batteries[:-n]))
             largest += nxt
-            last_idx = nxt_idx+1
-        largest += max(batteries[last_idx:])
+            #last_idx = nxt_idx+max(1,last_idx)
+            batteries = batteries[nxt_idx+1:]
+        largest += max(batteries)
         return int(largest)
 
     def solve(self, data: list[str], window: int = 2) -> int:
