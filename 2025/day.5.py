@@ -21,16 +21,10 @@ class Test(unittest.TestCase):
         self.assertTrue(True)
 
     def test_result(self):
-        self.assertEqual(0, Elf().execute())
+        self.assertEqual((0, 0), Elf().execute())
 
     def test_data(self):
-        self.assertEqual(3, Elf().solve(self.data))
-
-    @parameterized.expand([
-        [0, []],
-    ])
-    def test_examples(self, expected, input):
-        self.assertEqual(expected, Elf().solve(input))
+        self.assertEqual((3, 14), Elf().solve(self.data))
 
 class Elf():
     def open_file(self) -> list[str]:
@@ -38,10 +32,10 @@ class Elf():
             lines = inp.readlines()
         return [l.strip() for l in lines if len(l.strip()) > 0]
 
-    def execute(self) -> int:
+    def execute(self) -> (int, int):
         return self.solve(self.open_file())
 
-    def solve(self, data: list[str]) -> int:
+    def solve(self, data: list[str]) -> (int, int):
         ranges = []
         numbers = []
         for line in data:
@@ -51,6 +45,20 @@ class Elf():
             elif len(line) > 0:
                 numbers.append(int(line))
 
+        sorted_ranges = sorted(ranges, key=lambda x: x[0])
+        merged_ranges = []
+        for current in sorted_ranges:
+            if not merged_ranges:
+                merged_ranges.append(current)
+            else:
+                last_start, last_end = merged_ranges[-1]
+                current_start, current_end = current
+                if current_start <= last_end + 1:
+                    merged_ranges[-1] = (last_start, max(last_end, current_end))
+                else:
+                    merged_ranges.append(current)
+        fresh_count = sum([end - start + 1 for start, end in merged_ranges])
+
         count = 0
         for num in numbers:
             for start, end in ranges:
@@ -58,7 +66,7 @@ class Elf():
                     count += 1
                     break
 
-        return count
+        return (count, fresh_count)
 
 if __name__ == "__main__":
     unittest.main()
